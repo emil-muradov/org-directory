@@ -1,0 +1,16 @@
+*
+!.gitignore
+!**/
+!**/*.py
+!alembic/
+!alembic/**
+**/__pycache__/
+!Dockerfile
+!Makefile
+!README.md
+!.gitkeep
+!*.yml
+!*.toml
+!*.sql
+!*.ini
+!requirements.txt

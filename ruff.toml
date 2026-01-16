@@ -1,0 +1,14 @@
+line-length = 120
+target-version = "py310"
+
+[lint]
+extend-select = ["E", "F", "D4", "PL", "S", "ASYNC", "N"]
+extend-ignore = ["S311", "PLR2004", "D415", "D400", "PLR0913", "PLC0415"]
+
+[lint.per-file-ignores]
+"alembic/*" = ["D415", "D400"]
+"tests/*" = ["S101", "F811", "F401", "F541", "PLR0915"]
+
+[format]
+quote-style = "double"
+indent-style = "space"
