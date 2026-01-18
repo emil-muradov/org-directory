@@ -9,6 +9,10 @@ from schema import Organization, Industry, Building
 
 class OrganizationsRepository(ABC):
     @abstractmethod
+    def get_all_organizations(self, limit: int, offset: int) -> tuple[list[Organization], bool]:
+        pass
+
+    @abstractmethod
     def find_organization_by_id(self, organization_id: int) -> Organization:
         pass
 
@@ -41,14 +45,48 @@ class OrganizationsRepositoryImpl(OrganizationsRepository):
     def __init__(self, session: Session):
         self.session = session
 
+    def get_all_organizations(self, limit: int, offset: int) -> tuple[list[Organization], bool]:
+        rows = (
+            self.session.query(Organization)
+            .join(Organization.building)
+            .join(Organization.phones)
+            .join(Organization.industries)
+            .order_by(Organization.created_at)
+            .limit(limit + 1)
+            .offset(offset)
+        )
+        has_more = len(rows) > limit
+        return rows[:limit], has_more
+
     def find_organization_by_id(self, organization_id: int) -> Organization:
-        return self.session.query(Organization).filter(Organization.id == organization_id).first()
+        return (
+            self.session.query(Organization)
+            .join(Organization.building)
+            .join(Organization.phones)
+            .join(Organization.industries)
+            .filter(Organization.id == organization_id)
+            .first()
+        )
 
     def find_organizations_by_building_id(self, building_id: int) -> list[Organization]:
-        return self.session.query(Organization).filter(Organization.building_id == building_id).all()
+        return (
+            self.session.query(Organization)
+            .join(Organization.building)
+            .join(Organization.phones)
+            .join(Organization.industries)
+            .filter(Organization.building_id == building_id)
+            .all()
+        )
 
     def find_organizations_by_industry_id(self, industry_id: int) -> list[Organization]:
-        return self.session.query(Organization).join(Organization.industries).filter(Industry.id == industry_id).all()
+        return (
+            self.session.query(Organization)
+            .join(Organization.building)
+            .join(Organization.phones)
+            .join(Organization.industries)
+            .filter(Industry.id == industry_id)
+            .all()
+        )
 
     def find_organizations_by_geo_point(self, lat: float, lon: float) -> list[Organization]:
         point = WKTElement(f"POINT({lon} {lat})", srid=4326)
@@ -56,6 +94,8 @@ class OrganizationsRepositoryImpl(OrganizationsRepository):
         return (
             self.session.query(Organization)
             .join(Organization.building)
+            .join(Organization.phones)
+            .join(Organization.industries)
             .filter(func.ST_DWithin(Building.coordinates, point, 0.001))
             .all()
         )
@@ -65,6 +105,8 @@ class OrganizationsRepositoryImpl(OrganizationsRepository):
         return (
             self.session.query(Organization)
             .join(Organization.building)
+            .join(Organization.phones)
+            .join(Organization.industries)
             .filter(func.ST_Contains(polygon, Building.coordinates))
             .all()
         )
@@ -76,6 +118,8 @@ class OrganizationsRepositoryImpl(OrganizationsRepository):
 
         return (
             self.session.query(Organization)
+            .join(Organization.building)
+            .join(Organization.phones)
             .join(Organization.industries)
             .outerjoin(parent1, Industry.parent_id == parent1.id)
             .outerjoin(parent2, parent1.parent_id == parent2.id)

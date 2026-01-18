@@ -23,7 +23,7 @@ def get_organization(
 
 @router.get("/organizations")
 @inject
-def get_organization(
+def find_organizations(
     filter_query: Annotated[GetOrganizationsQueryParams, Query()],
     organizations_service: OrganizationsService = Depends(Provide[Container.organizations_service]),
 ) -> list[OrganizationDTO]:
