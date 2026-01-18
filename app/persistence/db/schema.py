@@ -53,6 +53,9 @@ class Building(Base):
     organizations = relationship("Organization", back_populates="building")
 
 
+Index("idx_building_address", Building.address, postgresql_using="gin")
+
+
 class Industry(Base):
     __tablename__ = "industries"
     id = Column(Integer, primary_key=True, index=True)

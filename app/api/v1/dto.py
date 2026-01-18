@@ -1,11 +1,33 @@
-from pydantic import BaseModel, Field
+from pydantic import BaseModel, model_validator
 
 
 class GetOrganizationsQueryParams(BaseModel):
-    building_id: int = Field()
-    industry_id: int = Field()
-    name: str = Field()
-    lat: float = Field()
-    lon: float = Field()
-    limit: int = Field(100, gt=0, le=100)
-    offset: int = Field(0, ge=0)
+    model_config = {"extra": "forbid"}
+
+    building_id: int | None = None
+    industry_id: int | None = None
+    name: str | None = None
+    address: str | None = None
+    lat: float | None = None
+    lon: float | None = None
+    limit: int = 100
+    offset: int = 0
+
+    @model_validator(mode="after")
+    def check_geometry_point(self):
+        if (self.lat is None) != (self.lon is None):
+            raise ValueError("Both lat and lon must be provided together, or neither.")
+        return self
+
+
+class BuildingDTO(BaseModel):
+    building_id: int
+    address: str
+    coordinates: tuple[float, float]
+
+
+class OrganizationDTO(BaseModel):
+    name: str
+    phones: list[str]
+    building: BuildingDTO
+    industries: list[str]
