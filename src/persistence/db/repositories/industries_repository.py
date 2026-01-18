@@ -9,4 +9,3 @@ class IndustriesRepository(ABC):
     @abstractmethod
     def find_industry_by_id(self, industry_id: int) -> Industry:
         pass
-
