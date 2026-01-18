@@ -21,7 +21,7 @@ organization_industries = Table(
 class Organization(Base):
     __tablename__ = "organizations"
     id = Column(Integer, primary_key=True, index=True)
-    name = Column(String(), nullable=False, index=True)
+    name = Column(String(), nullable=False, index=True, unique=True)
     building_id = Column(Integer, ForeignKey("buildings.id"), nullable=False, index=True)
     created_at = Column(DateTime, default=func.now())
     updated_at = Column(DateTime, default=func.now(), onupdate=func.now())
@@ -60,8 +60,11 @@ class Industry(Base):
     __tablename__ = "industries"
     id = Column(Integer, primary_key=True, index=True)
     parent_id = Column(Integer, ForeignKey("industries.id"))
-    name = Column(String, nullable=False, index=True)
+    name = Column(String, nullable=False, unique=True)
     created_at = Column(DateTime, default=func.now())
     updated_at = Column(DateTime, default=func.now(), onupdate=func.now())
     organizations = relationship("Organization", secondary=organization_industries, back_populates="industries")
-    parent = relationship("Industry")
+    children = relationship("Industry", lazy="joined", join_depth=3)
+
+
+Index("idx_industry_name", Industry.name, postgresql_using="gin")

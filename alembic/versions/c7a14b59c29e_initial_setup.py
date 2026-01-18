@@ -1,8 +1,8 @@
 """Initial Setup
 
-Revision ID: 37b5686bfef0
+Revision ID: c7a14b59c29e
 Revises:
-Create Date: 2026-01-17 12:55:59.958533
+Create Date: 2026-01-18 21:13:39.945813
 
 """
 
@@ -14,7 +14,7 @@ import geoalchemy2
 
 
 # revision identifiers, used by Alembic.
-revision: str = "37b5686bfef0"
+revision: str = "c7a14b59c29e"
 down_revision: Union[str, Sequence[str], None] = None
 branch_labels: Union[str, Sequence[str], None] = None
 depends_on: Union[str, Sequence[str], None] = None
@@ -38,6 +38,7 @@ def upgrade() -> None:
         sa.Column("updated_at", sa.DateTime(), nullable=True),
         sa.PrimaryKeyConstraint("id"),
     )
+    op.create_index("idx_building_address", "buildings", ["address"], unique=False, postgresql_using="gin")
     op.create_index(op.f("ix_buildings_id"), "buildings", ["id"], unique=False)
     op.create_table(
         "industries",
@@ -51,9 +52,10 @@ def upgrade() -> None:
             ["industries.id"],
         ),
         sa.PrimaryKeyConstraint("id"),
+        sa.UniqueConstraint("name"),
     )
+    op.create_index("idx_industry_name", "industries", ["name"], unique=False, postgresql_using="gin")
     op.create_index(op.f("ix_industries_id"), "industries", ["id"], unique=False)
-    op.create_index(op.f("ix_industries_name"), "industries", ["name"], unique=False)
     op.create_table(
         "organizations",
         sa.Column("id", sa.Integer(), nullable=False),
@@ -70,7 +72,7 @@ def upgrade() -> None:
     op.create_index("idx_organizations_name", "organizations", ["name"], unique=False, postgresql_using="gin")
     op.create_index(op.f("ix_organizations_building_id"), "organizations", ["building_id"], unique=False)
     op.create_index(op.f("ix_organizations_id"), "organizations", ["id"], unique=False)
-    op.create_index(op.f("ix_organizations_name"), "organizations", ["name"], unique=False)
+    op.create_index(op.f("ix_organizations_name"), "organizations", ["name"], unique=True)
     op.create_table(
         "organization_industries",
         sa.Column("organization_id", sa.Integer(), nullable=False),
@@ -116,9 +118,10 @@ def downgrade() -> None:
     op.drop_index(op.f("ix_organizations_building_id"), table_name="organizations")
     op.drop_index("idx_organizations_name", table_name="organizations", postgresql_using="gin")
     op.drop_table("organizations")
-    op.drop_index(op.f("ix_industries_name"), table_name="industries")
     op.drop_index(op.f("ix_industries_id"), table_name="industries")
+    op.drop_index("idx_industry_name", table_name="industries", postgresql_using="gin")
     op.drop_table("industries")
     op.drop_index(op.f("ix_buildings_id"), table_name="buildings")
+    op.drop_index("idx_building_address", table_name="buildings", postgresql_using="gin")
     op.drop_table("buildings")
     # ### end Alembic commands ###
