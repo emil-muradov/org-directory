@@ -4,7 +4,7 @@ from dependency_injector.wiring import Provide, inject
 
 from .dto import GetOrganizationsQueryParams, OrganizationDTO
 from core.services import OrganizationsService
-from persistence.di.container import Container
+from infrastructure.di.container import Container
 
 
 router = APIRouter(

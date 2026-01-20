@@ -1,4 +1,4 @@
-from persistence.db.schema import Organization, Building, Industry
+from infrastructure.persistence.db.schema import Organization, Building, Industry
 from .dto import BuildingDTO, OrganizationDTO
 
 

@@ -1,4 +1,4 @@
-from persistence.db.repositories import OrganizationsRepository
+from infrastructure.persistence.db.repositories import OrganizationsRepository
 from ..data_mappers import map_db_organization_to_dto
 from ..dto import OrganizationDTO, PaginatedResource
 
