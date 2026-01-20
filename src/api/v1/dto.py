@@ -12,7 +12,7 @@ class GetOrganizationsQueryParams(BaseModel):
     lat: float | None = (None,)
     lon: float | None = (None,)
     page: int = 1
-    size: int = 100
+    items_per_page: int = 100
 
     @model_validator(mode="after")
     def check_geometry_point(self):
