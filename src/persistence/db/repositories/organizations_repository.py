@@ -1,7 +1,8 @@
 from abc import ABC, abstractmethod
 
-from sqlalchemy import or_, func
-from sqlalchemy.orm import Session, aliased
+from sqlalchemy import or_, func, select
+from sqlalchemy.ext.asyncio import AsyncSession
+from sqlalchemy.orm import aliased
 from geoalchemy2.elements import WKTElement
 
 from schema import Organization, Industry, Building
@@ -9,115 +10,130 @@ from schema import Organization, Industry, Building
 
 class OrganizationsRepository(ABC):
     @abstractmethod
-    def get_all_organizations(self, limit: int, offset: int) -> tuple[list[Organization], bool]:
+    async def get_all_organizations(self, *, limit: int, offset: int) -> list[Organization]:
         pass
 
     @abstractmethod
-    def find_organization_by_id(self, organization_id: int) -> Organization:
+    async def find_organization_by_id(self, organization_id: int) -> Organization | None:
         pass
 
     @abstractmethod
-    def find_organizations_by_name(self, name: str) -> list[Organization]:
+    async def find_organizations_by_name(self, name: str) -> list[Organization]:
         pass
 
     @abstractmethod
-    def find_organizations_by_building_id(self, building_id: int) -> list[Organization]:
+    async def find_organizations_by_building_id(self, building_id: int) -> list[Organization]:
         pass
 
     @abstractmethod
-    def find_organizations_by_industry_id(self, industry_id: int) -> list[Organization]:
+    async def find_organizations_by_industry_id(self, industry_id: int) -> list[Organization]:
         pass
 
     @abstractmethod
-    def find_organizations_by_geo_point(self, lat: float, lon: float) -> list[Organization]:
+    async def find_organizations_by_geo_point(self, lat: float, lon: float) -> list[Organization]:
         pass
 
     @abstractmethod
-    def find_organizations_by_geo_area(self, polygon_wkt: str) -> list[Organization]:
+    async def find_organizations_by_geo_area(self, polygon_wkt: str) -> list[Organization]:
         pass
 
     @abstractmethod
-    def find_organizations_by_industry_name(self, industry_name: str) -> list[Organization]:
+    async def find_organizations_by_industry_name(self, industry_name: str) -> list[Organization]:
         pass
 
 
 class OrganizationsRepositoryImpl(OrganizationsRepository):
-    def __init__(self, session: Session):
-        self.session = session
+    def __init__(self, session: AsyncSession):
+        self._session = session
 
-    def get_all_organizations(self, limit: int, offset: int) -> tuple[list[Organization], bool]:
-        rows = (
-            self.session.query(Organization)
+    async def get_all_organizations(self, *, limit: int, offset: int) -> list[Organization]:
+        stmt = (
+            select(Organization)
             .join(Organization.building)
             .join(Organization.phones)
             .join(Organization.industries)
             .order_by(Organization.created_at)
-            .limit(limit + 1)
+            .limit(limit)
             .offset(offset)
         )
-        has_more = len(rows) > limit
-        return rows[:limit], has_more
+        result = await self._session.execute(stmt)
+        return list(result.scalars().all())
 
-    def find_organization_by_id(self, organization_id: int) -> Organization:
-        return (
-            self.session.query(Organization)
+    async def find_organization_by_id(self, organization_id: int) -> Organization | None:
+        stmt = (
+            select(Organization)
             .join(Organization.building)
             .join(Organization.phones)
             .join(Organization.industries)
             .filter(Organization.id == organization_id)
-            .first()
         )
+        result = await self._session.execute(stmt)
+        return result.scalar_one_or_none()
 
-    def find_organizations_by_building_id(self, building_id: int) -> list[Organization]:
-        return (
-            self.session.query(Organization)
+    async def find_organizations_by_name(self, name: str) -> list[Organization]:
+        stmt = (
+            select(Organization)
+            .join(Organization.building)
+            .join(Organization.phones)
+            .join(Organization.industries)
+            .filter(Organization.name.ilike(f"%{name}%"))
+        )
+        result = await self._session.execute(stmt)
+        return list(result.scalars().all())
+
+    async def find_organizations_by_building_id(self, building_id: int) -> list[Organization]:
+        stmt = (
+            select(Organization)
             .join(Organization.building)
             .join(Organization.phones)
             .join(Organization.industries)
             .filter(Organization.building_id == building_id)
-            .all()
         )
+        result = await self._session.execute(stmt)
+        return list(result.scalars().all())
 
-    def find_organizations_by_industry_id(self, industry_id: int) -> list[Organization]:
-        return (
-            self.session.query(Organization)
+    async def find_organizations_by_industry_id(self, industry_id: int) -> list[Organization]:
+        stmt = (
+            select(Organization)
             .join(Organization.building)
             .join(Organization.phones)
             .join(Organization.industries)
             .filter(Industry.id == industry_id)
-            .all()
         )
+        result = await self._session.execute(stmt)
+        return list(result.scalars().all())
 
-    def find_organizations_by_geo_point(self, lat: float, lon: float) -> list[Organization]:
+    async def find_organizations_by_geo_point(self, lat: float, lon: float) -> list[Organization]:
         point = WKTElement(f"POINT({lon} {lat})", srid=4326)
-        # Find organizations within 100 meters of the point (0.001 degrees ≈ 100m at equator)
-        return (
-            self.session.query(Organization)
+        stmt = (
+            select(Organization)
             .join(Organization.building)
             .join(Organization.phones)
             .join(Organization.industries)
             .filter(func.ST_DWithin(Building.coordinates, point, 0.001))
-            .all()
         )
+        result = await self._session.execute(stmt)
+        return list(result.scalars().all())
 
-    def find_organizations_by_geo_area(self, polygon_wkt: str) -> list[Organization]:
+    async def find_organizations_by_geo_area(self, polygon_wkt: str) -> list[Organization]:
         polygon = WKTElement(polygon_wkt, srid=4326)
-        return (
-            self.session.query(Organization)
+        stmt = (
+            select(Organization)
             .join(Organization.building)
             .join(Organization.phones)
             .join(Organization.industries)
             .filter(func.ST_Contains(polygon, Building.coordinates))
-            .all()
         )
+        result = await self._session.execute(stmt)
+        return list(result.scalars().all())
 
-    def find_organizations_by_industry_name(self, industry_name: str) -> list[Organization]:
+    async def find_organizations_by_industry_name(self, industry_name: str) -> list[Organization]:
         parent1 = aliased(Industry)
         parent2 = aliased(Industry)
         parent3 = aliased(Industry)
 
-        return (
-            self.session.query(Organization)
+        stmt = (
+            select(Organization)
             .join(Organization.building)
             .join(Organization.phones)
             .join(Organization.industries)
@@ -133,5 +149,6 @@ class OrganizationsRepositoryImpl(OrganizationsRepository):
                 )
             )
             .distinct()
-            .all()
         )
+        result = await self._session.execute(stmt)
+        return list(result.scalars().all())
