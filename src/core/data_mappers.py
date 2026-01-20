@@ -1,5 +1,5 @@
 from infrastructure.persistence.db.schema import Organization, Building, Industry
-from .dto import BuildingDTO, OrganizationDTO
+from core.dto import BuildingDTO, OrganizationDTO
 
 
 def map_db_organization_to_dto(db_organization: Organization) -> OrganizationDTO:

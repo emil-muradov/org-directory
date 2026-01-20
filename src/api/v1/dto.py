@@ -8,7 +8,7 @@ class GetOrganizationsQueryParams(BaseModel):
     industry_id: int | None = None
     organization_name: str | None = None
     address: str | None = None
-    polygon: list[tuple(float, float)] | None = None
+    polygon: list[(float, float)] | None = None
     lat: float | None = (None,)
     lon: float | None = (None,)
     page: int = 1

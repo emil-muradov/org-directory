@@ -2,7 +2,7 @@ from dependency_injector import containers, providers
 from sqlalchemy.ext.asyncio import create_async_engine, async_sessionmaker
 
 from core.services import OrganizationService
-from persistence.db.repositories import OrganizationRepositoryImpl
+from infrastructure.persistence.db.repositories import OrganizationRepositoryImpl
 from config.settings import settings
 
 

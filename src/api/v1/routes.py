@@ -4,9 +4,10 @@ from fastapi import APIRouter, Query, Depends
 from fastapi.responses import JSONResponse
 from dependency_injector.wiring import Provide, inject
 
-from .dto import GetOrganizationsQueryParams, OrganizationDTO
 from core.services import OrganizationService
+from core.dto import OrganizationDTO
 from infrastructure.di.container import Container
+from .dto import GetOrganizationsQueryParams
 
 
 router = APIRouter(

@@ -5,7 +5,7 @@ from sqlalchemy.ext.asyncio import AsyncSession
 from sqlalchemy.orm import aliased
 from geoalchemy2.elements import WKTElement
 
-from schema import Organization, Industry, Building
+from infrastructure.persistence.db.schema import Organization, Industry, Building
 
 
 class OrganizationRepository(ABC):

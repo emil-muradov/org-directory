@@ -1,3 +1,7 @@
+[build-system]
+requires = ["setuptools>=77.0.3", "wheel"]
+build-backend = "setuptools.build_meta"
+
 [project]
 name = "org-directory"
 version = "0.1.0"
@@ -58,3 +62,6 @@ dependencies = [
     "watchfiles==1.1.1",
     "websockets==16.0",
 ]
+
+[tool.setuptools.packages.find]
+where = ["src"]

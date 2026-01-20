@@ -1,10 +1,10 @@
-from infrastructure.persistence.db.repositories import OrganizationsRepository
-from ..data_mappers import map_db_organization_to_dto
-from ..dto import OrganizationDTO, PaginatedResource
+from infrastructure.persistence.db.repositories import OrganizationRepository
+from core.data_mappers import map_db_organization_to_dto
+from core.dto import OrganizationDTO, PaginatedResource
 
 
 class OrganizationService:
-    def __init__(self, organization_repository: OrganizationsRepository):
+    def __init__(self, organization_repository: OrganizationRepository):
         self._organization_repository = organization_repository
 
     async def find_organizations(
