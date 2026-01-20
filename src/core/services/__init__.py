@@ -1,3 +1,3 @@
-from .organizations_service import OrganizationsService
+from .organization_service import OrganizationService
 
-__all__ = ["OrganizationsService"]
+__all__ = ["OrganizationService"]

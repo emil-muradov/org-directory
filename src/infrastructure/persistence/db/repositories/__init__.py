@@ -1,6 +1,6 @@
-from .organizations_repository import OrganizationsRepository, OrganizationsRepositoryImpl
+from .organization_repository import OrganizationRepository, OrganizationRepositoryImpl
 
 __all__ = [
-    "OrganizationsRepository",
-    "OrganizationsRepositoryImpl",
+    "OrganizationRepository",
+    "OrganizationRepositoryImpl",
 ]

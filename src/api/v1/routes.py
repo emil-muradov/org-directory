@@ -1,9 +1,11 @@
 from typing import Annotated
+
 from fastapi import APIRouter, Query, Depends
+from fastapi.responses import JSONResponse
 from dependency_injector.wiring import Provide, inject
 
 from .dto import GetOrganizationsQueryParams, OrganizationDTO
-from core.services import OrganizationsService
+from core.services import OrganizationService
 from infrastructure.di.container import Container
 
 
@@ -14,17 +16,19 @@ router = APIRouter(
 
 @router.get(f"/organizations/{id}")
 @inject
-def get_organization(
+async def get_organization(
     organization_id: int,
-    organizations_service: OrganizationsService = Depends(Provide[Container.organizations_service]),
+    organization_service: OrganizationService = Depends(Provide[Container.organization_service]),
 ) -> OrganizationDTO:
-    pass
+    org = await organization_service.find_organization_by_id(organization_id)
+    return JSONResponse(content=org, status_code=200)
 
 
 @router.get("/organizations")
 @inject
-def find_organizations(
+async def find_organizations(
     filter_query: Annotated[GetOrganizationsQueryParams, Query()],
-    organizations_service: OrganizationsService = Depends(Provide[Container.organizations_service]),
+    organization_service: OrganizationService = Depends(Provide[Container.organization_service]),
 ) -> list[OrganizationDTO]:
-    pass
+    orgs = await organization_service.find_organizations(**filter_query.model_dump())
+    return JSONResponse(content=orgs, status_code=200)

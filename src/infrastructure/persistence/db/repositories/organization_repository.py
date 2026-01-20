@@ -8,7 +8,7 @@ from geoalchemy2.elements import WKTElement
 from schema import Organization, Industry, Building
 
 
-class OrganizationsRepository(ABC):
+class OrganizationRepository(ABC):
     @abstractmethod
     async def get_all_organizations(self, *, limit: int, offset: int) -> list[Organization]:
         pass
@@ -42,7 +42,7 @@ class OrganizationsRepository(ABC):
         pass
 
 
-class OrganizationsRepositoryImpl(OrganizationsRepository):
+class OrganizationRepositoryImpl(OrganizationRepository):
     def __init__(self, session: AsyncSession):
         self._session = session
 
