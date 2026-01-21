@@ -20,7 +20,7 @@ class OrganizationService:
         page: int,
         items_per_page: int,
     ) -> PaginatedResource[OrganizationDTO]:
-        if building_id is not None:
+        if building_id:
             result = await self._organization_repository.find_organizations_by_building_id(building_id)
             return PaginatedResource(
                 items=list(map(map_db_organization_to_dto, result)),
@@ -28,7 +28,8 @@ class OrganizationService:
                 page=page,
                 items_per_page=items_per_page,
             )
-        if industry_id is not None:
+
+        if industry_id:
             result = await self._organization_repository.find_organizations_by_industry_id(industry_id)
             return PaginatedResource(
                 items=list(map(map_db_organization_to_dto, result)),
@@ -36,7 +37,8 @@ class OrganizationService:
                 page=page,
                 items_per_page=items_per_page,
             )
-        if organization_name is not None:
+
+        if organization_name:
             result = await self._organization_repository.find_organizations_by_name(organization_name)
             return PaginatedResource(
                 items=list(map(map_db_organization_to_dto, result)),
@@ -44,7 +46,8 @@ class OrganizationService:
                 page=page,
                 items_per_page=items_per_page,
             )
-        if industry_name is not None:
+
+        if industry_name:
             result = await self._organization_repository.find_organizations_by_industry_name(industry_name)
             return PaginatedResource(
                 items=list(map(map_db_organization_to_dto, result)),
@@ -52,7 +55,8 @@ class OrganizationService:
                 page=page,
                 items_per_page=items_per_page,
             )
-        if lat is not None and lon is not None:
+
+        if lat and lon:
             result = await self._organization_repository.find_organizations_by_geo_point(lat, lon)
             return PaginatedResource(
                 items=list(map(map_db_organization_to_dto, result)),
@@ -60,7 +64,8 @@ class OrganizationService:
                 page=page,
                 items_per_page=items_per_page,
             )
-        if polygon_wkt is not None:
+
+        if polygon_wkt:
             result = await self._organization_repository.find_organizations_by_geo_area(polygon_wkt)
             return PaginatedResource(
                 items=list(map(map_db_organization_to_dto, result)),
@@ -72,6 +77,7 @@ class OrganizationService:
         result = await self._organization_repository.get_all_organizations(
             limit=items_per_page + 1, offset=(page - 1) * items_per_page
         )
+
         return PaginatedResource(
             items=map(map_db_organization_to_dto, result[:items_per_page]),
             has_more=len(result) > items_per_page,

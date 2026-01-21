@@ -1,4 +1,4 @@
-from pydantic import BaseModel, model_validator
+from pydantic import BaseModel, model_validator, Field
 
 
 class GetOrganizationsQueryParams(BaseModel):
@@ -11,8 +11,8 @@ class GetOrganizationsQueryParams(BaseModel):
     polygon: list[(float, float)] | None = None
     lat: float | None = None
     lon: float | None = None
-    page: int = 1
-    items_per_page: int = 100
+    page: int = Field(gt=0, default=1)
+    items_per_page: int = Field(gt=0, default=50)
 
     @model_validator(mode="after")
     def check_geometry_point(self):
