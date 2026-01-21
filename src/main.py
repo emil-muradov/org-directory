@@ -1,4 +1,5 @@
 from fastapi import FastAPI
+from fastapi.responses import Response
 from starlette.middleware.cors import CORSMiddleware
 import uvicorn
 
@@ -18,9 +19,9 @@ app.add_middleware(
 app.include_router(v1_router)
 
 
-@app.head("/")
+@app.get("/")
 def health():
-    return {"status": 200}
+    return Response(status_code=200)
 
 
 if __name__ == "__main__":
