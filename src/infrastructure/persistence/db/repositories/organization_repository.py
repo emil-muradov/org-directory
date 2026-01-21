@@ -2,7 +2,7 @@ from abc import ABC, abstractmethod
 
 from sqlalchemy import or_, func, select
 from sqlalchemy.ext.asyncio import AsyncSession
-from sqlalchemy.orm import aliased
+from sqlalchemy.orm import aliased, selectinload
 from geoalchemy2.elements import WKTElement
 
 from infrastructure.persistence.db.schema import Organization, Industry, Building
@@ -49,9 +49,11 @@ class OrganizationRepositoryImpl(OrganizationRepository):
     async def get_all_organizations(self, *, limit: int, offset: int) -> list[Organization]:
         stmt = (
             select(Organization)
-            .join(Organization.building)
-            .join(Organization.phones)
-            .join(Organization.industries)
+            .options(
+                selectinload(Organization.building),
+                selectinload(Organization.phones),
+                selectinload(Organization.industries),
+            )
             .order_by(Organization.created_at)
             .limit(limit)
             .offset(offset)
@@ -62,9 +64,11 @@ class OrganizationRepositoryImpl(OrganizationRepository):
     async def find_organization_by_id(self, organization_id: int) -> Organization | None:
         stmt = (
             select(Organization)
-            .join(Organization.building)
-            .join(Organization.phones)
-            .join(Organization.industries)
+            .options(
+                selectinload(Organization.building),
+                selectinload(Organization.phones),
+                selectinload(Organization.industries),
+            )
             .filter(Organization.id == organization_id)
         )
         result = await self._session.execute(stmt)
@@ -73,9 +77,11 @@ class OrganizationRepositoryImpl(OrganizationRepository):
     async def find_organizations_by_name(self, name: str) -> list[Organization]:
         stmt = (
             select(Organization)
-            .join(Organization.building)
-            .join(Organization.phones)
-            .join(Organization.industries)
+            .options(
+                selectinload(Organization.building),
+                selectinload(Organization.phones),
+                selectinload(Organization.industries),
+            )
             .filter(Organization.name.ilike(f"%{name}%"))
         )
         result = await self._session.execute(stmt)
@@ -84,9 +90,11 @@ class OrganizationRepositoryImpl(OrganizationRepository):
     async def find_organizations_by_building_id(self, building_id: int) -> list[Organization]:
         stmt = (
             select(Organization)
-            .join(Organization.building)
-            .join(Organization.phones)
-            .join(Organization.industries)
+            .options(
+                selectinload(Organization.building),
+                selectinload(Organization.phones),
+                selectinload(Organization.industries),
+            )
             .filter(Organization.building_id == building_id)
         )
         result = await self._session.execute(stmt)
@@ -95,10 +103,14 @@ class OrganizationRepositoryImpl(OrganizationRepository):
     async def find_organizations_by_industry_id(self, industry_id: int) -> list[Organization]:
         stmt = (
             select(Organization)
-            .join(Organization.building)
-            .join(Organization.phones)
             .join(Organization.industries)
+            .options(
+                selectinload(Organization.building),
+                selectinload(Organization.phones),
+                selectinload(Organization.industries),
+            )
             .filter(Industry.id == industry_id)
+            .distinct()
         )
         result = await self._session.execute(stmt)
         return list(result.scalars().all())
@@ -108,9 +120,13 @@ class OrganizationRepositoryImpl(OrganizationRepository):
         stmt = (
             select(Organization)
             .join(Organization.building)
-            .join(Organization.phones)
-            .join(Organization.industries)
+            .options(
+                selectinload(Organization.building),
+                selectinload(Organization.phones),
+                selectinload(Organization.industries),
+            )
             .filter(func.ST_DWithin(Building.coordinates, point, 0.001))
+            .distinct()
         )
         result = await self._session.execute(stmt)
         return list(result.scalars().all())
@@ -120,9 +136,13 @@ class OrganizationRepositoryImpl(OrganizationRepository):
         stmt = (
             select(Organization)
             .join(Organization.building)
-            .join(Organization.phones)
-            .join(Organization.industries)
+            .options(
+                selectinload(Organization.building),
+                selectinload(Organization.phones),
+                selectinload(Organization.industries),
+            )
             .filter(func.ST_Contains(polygon, Building.coordinates))
+            .distinct()
         )
         result = await self._session.execute(stmt)
         return list(result.scalars().all())
@@ -134,12 +154,15 @@ class OrganizationRepositoryImpl(OrganizationRepository):
 
         stmt = (
             select(Organization)
-            .join(Organization.building)
-            .join(Organization.phones)
             .join(Organization.industries)
             .outerjoin(parent1, Industry.parent_id == parent1.id)
             .outerjoin(parent2, parent1.parent_id == parent2.id)
             .outerjoin(parent3, parent2.parent_id == parent3.id)
+            .options(
+                selectinload(Organization.building),
+                selectinload(Organization.phones),
+                selectinload(Organization.industries),
+            )
             .filter(
                 or_(
                     Industry.name.ilike(f"%{industry_name}%"),
