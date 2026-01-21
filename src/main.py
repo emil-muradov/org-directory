@@ -4,6 +4,7 @@ from starlette.middleware.cors import CORSMiddleware
 import uvicorn
 
 from api.v1.routes import router as v1_router
+from infrastructure.di.container import Container
 
 
 app = FastAPI()
@@ -15,6 +16,9 @@ app.add_middleware(
     allow_methods=["*"],
     allow_headers=["*"],
 )
+
+container = Container()
+container.wire(modules=["api.v1.routes"])
 
 app.include_router(v1_router)
 
