@@ -16,7 +16,7 @@ class OrganizationDTO(BaseModel):
 
 
 class PaginatedResource[T](BaseModel):
-    items: T
+    items: list[T]
     page: int
     has_more: bool
     items_per_page: int

@@ -22,6 +22,8 @@ async def get_organization(
     organization_service: OrganizationService = Depends(Provide[Container.organization_service]),
 ) -> OrganizationDTO:
     org = await organization_service.find_organization_by_id(organization_id)
+    if org is None:
+        return JSONResponse(status_code=404)
     return JSONResponse(content=org, status_code=200)
 
 
@@ -31,5 +33,5 @@ async def find_organizations(
     filter_query: Annotated[GetOrganizationsQueryParams, Query()],
     organization_service: OrganizationService = Depends(Provide[Container.organization_service]),
 ) -> list[OrganizationDTO]:
-    orgs = await organization_service.find_organizations(**filter_query.model_dump())
+    orgs = await organization_service.find_organizations(**filter_query.model_dump(exclude_none=True))
     return JSONResponse(content=orgs, status_code=200)
