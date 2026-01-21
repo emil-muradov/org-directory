@@ -11,7 +11,7 @@ from .dto import GetOrganizationsQueryParams
 
 
 router = APIRouter(
-    prefix="/v1/",
+    prefix="/v1",
 )
 
 
