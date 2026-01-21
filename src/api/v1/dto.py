@@ -9,8 +9,8 @@ class GetOrganizationsQueryParams(BaseModel):
     organization_name: str | None = None
     address: str | None = None
     polygon: list[(float, float)] | None = None
-    lat: float | None = (None,)
-    lon: float | None = (None,)
+    lat: float | None = None
+    lon: float | None = None
     page: int = 1
     items_per_page: int = 100
 
