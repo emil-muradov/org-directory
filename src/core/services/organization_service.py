@@ -70,7 +70,7 @@ class OrganizationService:
             )
 
         result = await self._organization_repository.get_all_organizations(
-            limit=items_per_page + 1, offset=page * items_per_page
+            limit=items_per_page + 1, offset=(page - 1) * items_per_page
         )
         return PaginatedResource(
             items=map(map_db_organization_to_dto, result[:items_per_page]),

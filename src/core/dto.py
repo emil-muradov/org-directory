@@ -1,10 +1,16 @@
+from typing import TypedDict
 from pydantic import BaseModel
+
+
+class Point(TypedDict):
+    lat: float
+    lon: float
 
 
 class BuildingDTO(BaseModel):
     id: int
     address: str
-    coordinates: tuple[float, float]
+    coordinates: Point
 
 
 class OrganizationDTO(BaseModel):

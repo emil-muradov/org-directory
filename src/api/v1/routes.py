@@ -15,13 +15,13 @@ router = APIRouter(
 )
 
 
-@router.get(f"/organizations/{id}")
+@router.get("/organizations/{id}")
 @inject
 async def get_organization(
-    organization_id: int,
+    id: int,
     organization_service: OrganizationService = Depends(Provide[Container.organization_service]),
 ) -> OrganizationDTO:
-    org = await organization_service.find_organization_by_id(organization_id)
+    org = await organization_service.find_organization_by_id(id)
     if org is None:
         return JSONResponse(status_code=404)
     return JSONResponse(content=org.model_dump(), status_code=200)

@@ -1,5 +1,7 @@
+from geoalchemy2.shape import to_shape
+
 from infrastructure.persistence.db.schema import Organization, Building, Industry
-from core.dto import BuildingDTO, OrganizationDTO
+from core.dto import BuildingDTO, OrganizationDTO, Point
 
 
 def map_db_organization_to_dto(db_organization: Organization) -> OrganizationDTO:
@@ -13,7 +15,8 @@ def map_db_organization_to_dto(db_organization: Organization) -> OrganizationDTO
 
 
 def map_db_building_to_dto(db_building: Building) -> BuildingDTO:
-    return BuildingDTO(id=db_building.id, address=db_building.address, coordinates=list(db_building.coordinates))
+    point = to_shape(db_building.coordinates)
+    return BuildingDTO(id=db_building.id, address=db_building.address, coordinates=Point(lat=point.y, lon=point.x))
 
 
 def map_db_industry_to_dto(db_industry: Industry) -> list[str]:

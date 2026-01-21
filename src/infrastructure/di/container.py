@@ -6,7 +6,6 @@ from infrastructure.persistence.db.repositories import OrganizationRepositoryImp
 from config.settings import settings
 
 
-
 class Container(containers.DeclarativeContainer):
     db_engine = create_async_engine(
         settings.db_url.get_secret_value(),
