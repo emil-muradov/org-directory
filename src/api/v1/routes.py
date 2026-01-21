@@ -24,7 +24,7 @@ async def get_organization(
     org = await organization_service.find_organization_by_id(organization_id)
     if org is None:
         return JSONResponse(status_code=404)
-    return JSONResponse(content=org, status_code=200)
+    return JSONResponse(content=org.model_dump(), status_code=200)
 
 
 @router.get("/organizations")
@@ -34,4 +34,4 @@ async def find_organizations(
     organization_service: OrganizationService = Depends(Provide[Container.organization_service]),
 ) -> list[OrganizationDTO]:
     orgs = await organization_service.find_organizations(**filter_query.model_dump(exclude_none=True))
-    return JSONResponse(content=orgs, status_code=200)
+    return JSONResponse(content=orgs.model_dump(), status_code=200)
