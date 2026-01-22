@@ -1,3 +1,4 @@
+from geoalchemy2 import WKTElement
 from geoalchemy2.shape import to_shape
 
 from infrastructure.persistence.db.schema import Organization, Building, Industry
@@ -21,3 +22,12 @@ def map_db_building_to_dto(db_building: Building) -> BuildingDTO:
 
 def map_db_industry_to_dto(db_industry: Industry) -> list[str]:
     pass
+
+
+def map_point_to_db_point(*, lat: float, lon: float) -> WKTElement:
+    return WKTElement(f"POINT({lon}{lat})", srid=4326)
+
+
+def map_polygon_to_db_polygon(polygon: list[(float, float)]) -> WKTElement:
+    coords = [f"{lon} {lat}" for lat, lon in polygon]
+    return WKTElement(f"POLYGON(({', '.join(coords)}))", srid=4326)

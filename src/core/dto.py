@@ -1,5 +1,5 @@
 from typing import TypedDict
-from pydantic import BaseModel
+from pydantic import BaseModel, Field
 
 
 class Point(TypedDict):
@@ -23,6 +23,6 @@ class OrganizationDTO(BaseModel):
 
 class PaginatedResource[T](BaseModel):
     items: list[T]
-    page: int
-    has_more: bool
-    items_per_page: int
+    page: int = Field(description="Current page number")
+    page_items: int = Field(description="Number of items on the current page")
+    has_more: bool = Field(description="Whether there are more pages available")
