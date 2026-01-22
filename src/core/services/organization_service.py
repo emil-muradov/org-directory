@@ -79,7 +79,7 @@ class OrganizationService:
         )
 
         return PaginatedResource(
-            items=map(map_db_organization_to_dto, result[:items_per_page]),
+            items=list(map(map_db_organization_to_dto, result[:items_per_page])),
             has_more=len(result) > items_per_page,
             page=page,
             items_per_page=items_per_page,

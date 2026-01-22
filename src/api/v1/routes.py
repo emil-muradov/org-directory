@@ -5,7 +5,7 @@ from fastapi.responses import JSONResponse
 from dependency_injector.wiring import Provide, inject
 
 from core.services import OrganizationService
-from core.dto import OrganizationDTO
+from core.dto import OrganizationDTO, PaginatedResource
 from infrastructure.di.container import Container
 from .dto import GetOrganizationsQueryParams
 
@@ -32,6 +32,6 @@ async def get_organization(
 async def find_organizations(
     filter_query: Annotated[GetOrganizationsQueryParams, Query()],
     organization_service: OrganizationService = Depends(Provide[Container.organization_service]),
-) -> list[OrganizationDTO]:
+) -> PaginatedResource[OrganizationDTO]:
     orgs = await organization_service.find_organizations(**filter_query.model_dump(exclude_none=True))
     return JSONResponse(content=orgs.model_dump(), status_code=200)
