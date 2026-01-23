@@ -1,9 +1,8 @@
 from dataclasses import dataclass
 
-from core.mappers import map_point_to_db_point, map_polygon_to_db_polygon
+from core.mappers import map_point_to_db_point, map_polygon_to_db_polygon, map_db_organization_to_entity
 from core.entities import Organization
 from infrastructure.persistence.db.repositories import OrganizationRepository
-from infrastructure.persistence.mappers import map_db_organization_to_entity
 
 
 @dataclass
