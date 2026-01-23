@@ -15,7 +15,18 @@ router = APIRouter(
 )
 
 
-@router.get("/organizations/{id}")
+@router.get(
+    "/organizations/{id}",
+    summary="Get organization by ID",
+    description="Retrieve a single organization by its unique identifier.",
+    response_description="The organization details including name, phones, building information, and industries.",
+    responses={
+        200: {"description": "Success"},
+        404: {"description": "Organization not found"},
+    },
+    tags=["organizations"],
+    operation_id="getOrganizationById",
+)
 @inject
 async def get_organization(
     id: int,
@@ -27,7 +38,24 @@ async def get_organization(
     return JSONResponse(content=org.model_dump(), status_code=200)
 
 
-@router.get("/organizations")
+@router.get(
+    "/organizations",
+    summary="Search and filter organizations",
+    description=(
+        "Retrieve a paginated list of organizations with optional filtering capabilities. "
+        "Supports filtering by building ID, industry ID or name, organization name, address, "
+        "geographic location (point or polygon), and pagination. "
+        "Cannot use both point-based (lat/lon) and polygon-based filters together. "
+        "A polygon must have at least 3 points."
+    ),
+    response_description="Paginated list of organizations matching the filter criteria.",
+    responses={
+        200: {"description": "Success"},
+        422: {"description": "Validation error - invalid filter combinations or parameters"},
+    },
+    tags=["organizations"],
+    operation_id="findOrganizations",
+)
 @inject
 async def find_organizations(
     filter_query: Annotated[GetOrganizationsQueryParams, Query()],
