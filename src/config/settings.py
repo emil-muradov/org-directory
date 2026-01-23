@@ -1,9 +1,8 @@
-from pathlib import Path
 from pydantic_settings import BaseSettings
 from pydantic import Field, SecretStr
+from dotenv import load_dotenv, find_dotenv
 
-
-PROJECT_ROOT = Path(__file__).parent.parent.parent
+load_dotenv(find_dotenv())
 
 
 class Settings(BaseSettings):
@@ -12,12 +11,4 @@ class Settings(BaseSettings):
     db_pool_size: int = Field(8)
 
 
-settings = Settings(
-    _env_file=(
-        PROJECT_ROOT / ".env",
-        PROJECT_ROOT / ".env.local",
-        PROJECT_ROOT / ".env.dev",
-        PROJECT_ROOT / ".env.prod",
-    ),
-    _env_file_encoding="utf-8",
-)
+settings = Settings()
