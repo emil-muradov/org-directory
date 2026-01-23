@@ -1,4 +1,34 @@
-from pydantic import BaseModel, model_validator, Field
+from typing import TypedDict
+
+from pydantic import BaseModel, Field, model_validator
+
+from core.entities import Point
+
+
+class PointDTO(TypedDict):
+    lat: float
+    lon: float
+
+
+class BuildingDTO(BaseModel):
+    id: int = Field(description="Building unique identifier")
+    address: str = Field(description="Building address")
+    coordinates: PointDTO = Field(description="Geographic coordinates of the building")
+
+
+class OrganizationDTO(BaseModel):
+    id: int = Field(description="Organization unique identifier")
+    name: str = Field(description="Organization name")
+    phones: list[str] = Field(description="List of phone numbers")
+    building: BuildingDTO = Field(description="Building information")
+    industries: list[str] = Field(description="List of industry names")
+
+
+class PaginatedResource[T](BaseModel):
+    items: list[T] = Field(description="List of items on the current page")
+    page: int = Field(description="Current page number")
+    page_items: int = Field(description="Number of items on the current page")
+    has_more: bool = Field(description="Whether there are more pages available")
 
 
 class GetOrganizationsQueryParams(BaseModel):
@@ -13,8 +43,12 @@ class GetOrganizationsQueryParams(BaseModel):
         None,
         description="Filter by geographic polygon - list of (latitude, longitude) tuples. Minimum 3 points required.",
     )
-    lat: float | None = Field(None, description="Latitude for point-based filtering. Must be provided together with lon.")
-    lon: float | None = Field(None, description="Longitude for point-based filtering. Must be provided together with lat.")
+    lat: float | None = Field(
+        None, description="Latitude for point-based filtering. Must be provided together with lon."
+    )
+    lon: float | None = Field(
+        None, description="Longitude for point-based filtering. Must be provided together with lat."
+    )
     page: int = Field(gt=0, default=1, description="Page number (must be greater than 0)")
     items_per_page: int = Field(gt=0, default=50, description="Number of items per page (must be greater than 0)")
 

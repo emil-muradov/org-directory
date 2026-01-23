@@ -4,10 +4,10 @@ from fastapi import APIRouter, HTTPException, Query, Depends
 from fastapi.responses import JSONResponse
 from dependency_injector.wiring import Provide, inject
 
+from api.v1.dto import GetOrganizationsQueryParams, OrganizationDTO, PaginatedResource
+from api.v1.mappers import map_organization_to_dto
 from core.services import OrganizationService
-from core.dto import OrganizationDTO, PaginatedResource
 from infrastructure.di.container import Container
-from .dto import GetOrganizationsQueryParams
 
 
 router = APIRouter(
@@ -35,7 +35,8 @@ async def get_organization(
     org = await organization_service.find_organization_by_id(id)
     if org is None:
         raise HTTPException(status_code=404, detail="Organization not found")
-    return JSONResponse(content=org.model_dump(), status_code=200)
+    dto = map_organization_to_dto(org)
+    return JSONResponse(content=dto.model_dump(), status_code=200)
 
 
 @router.get(
@@ -61,5 +62,15 @@ async def find_organizations(
     filter_query: Annotated[GetOrganizationsQueryParams, Query()],
     organization_service: OrganizationService = Depends(Provide[Container.organization_service]),
 ) -> PaginatedResource[OrganizationDTO]:
-    orgs = await organization_service.find_organizations(**filter_query.model_dump(exclude_none=True))
-    return JSONResponse(content=orgs.model_dump(), status_code=200)
+    paginated_result = await organization_service.find_organizations(**filter_query.model_dump(exclude_none=True))
+
+    # Map domain entities to DTOs
+    org_dtos = [map_organization_to_dto(org) for org in paginated_result.items]
+
+    paginated_dto = PaginatedResource(
+        items=org_dtos,
+        page=paginated_result.page,
+        page_items=paginated_result.page_items,
+        has_more=paginated_result.has_more,
+    )
+    return JSONResponse(content=paginated_dto.model_dump(), status_code=200)

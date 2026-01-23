@@ -1,21 +1,29 @@
-from geoalchemy2 import WKTElement
+from dataclasses import dataclass
+
+from core.mappers import map_point_to_db_point, map_polygon_to_db_polygon
+from core.entities import Organization
 from infrastructure.persistence.db.repositories import OrganizationRepository
-from core.data_mappers import map_db_organization_to_dto, map_point_to_db_point, map_polygon_to_db_polygon
-from core.dto import OrganizationDTO, PaginatedResource
+from infrastructure.persistence.mappers import map_db_organization_to_entity
+
+
+@dataclass
+class PaginatedResult[T]:
+    items: list[T]
+    page: int
+    page_items: int
+    has_more: bool
 
 
 class OrganizationService:
     def __init__(self, organization_repository: OrganizationRepository):
         self._organization_repository = organization_repository
 
-    def _build_paginated_response(
-        self, results: list, page: int, items_per_page: int
-    ) -> PaginatedResource[OrganizationDTO]:
-        items = [map_db_organization_to_dto(org) for org in results[:items_per_page]]
+    def _build_paginated_response(self, results: list, page: int, items_per_page: int) -> PaginatedResult[Organization]:
+        domain_entities = [map_db_organization_to_entity(org) for org in results[:items_per_page]]
         has_more = len(results) > items_per_page
 
-        return PaginatedResource(
-            items=items,
+        return PaginatedResult(
+            items=domain_entities,
             has_more=has_more,
             page=page,
             page_items=len(results),
@@ -34,7 +42,7 @@ class OrganizationService:
         lon: float | None = None,
         page: int,
         items_per_page: int,
-    ) -> PaginatedResource[OrganizationDTO]:
+    ) -> PaginatedResult[Organization]:
         # Validate conflicting filters
         has_point_filter = lat is not None and lon is not None
         has_polygon_filter = polygon is not None
@@ -81,8 +89,8 @@ class OrganizationService:
 
         return self._build_paginated_response(result, page, items_per_page)
 
-    async def find_organization_by_id(self, organization_id: int) -> OrganizationDTO | None:
+    async def find_organization_by_id(self, organization_id: int) -> Organization | None:
         result = await self._organization_repository.find_organization_by_id(organization_id)
         if result is None:
             return None
-        return map_db_organization_to_dto(result)
+        return map_db_organization_to_entity(result)
