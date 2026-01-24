@@ -41,14 +41,12 @@ dependencies = [
     "pydantic-extra-types==2.11.0",
     "pydantic-settings==2.12.0",
     "pygments==2.19.2",
-    "pytest>=9.0.2",
     "python-dotenv==1.2.1",
     "python-multipart==0.0.21",
     "pyyaml==6.0.3",
     "rich==14.2.0",
     "rich-toolkit==0.17.1",
     "rignore==0.7.6",
-    "ruff==0.14.13",
     "sentry-sdk==2.49.0",
     "shapely>=2.1.2",
     "shellingham==1.5.4",
@@ -62,6 +60,12 @@ dependencies = [
     "uvloop==0.22.1",
     "watchfiles==1.1.1",
     "websockets==16.0",
+]
+
+[project.optional-dependencies]
+dev = [
+    "pytest>=9.0.2",
+    "ruff==0.14.13",
 ]
 
 [tool.setuptools.packages.find]
