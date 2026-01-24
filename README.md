@@ -17,9 +17,9 @@ A directory of organizations with location-based search capabilities.
 
     ```bash
     # Enable required extensions
-    docker compose exec db psql -U admin -d postgres -c "create extension if not exists postgis;"
-    docker compose exec db psql -U admin -d postgres -c "create extension if not exists pg_trgm;"
-    docker compose exec db psql -U admin -d postgres -c "create extension if not exists btree_gin;"
+    docker compose exec db psql -U org -d postgres -c "create extension if not exists postgis;"
+    docker compose exec db psql -U org -d postgres -c "create extension if not exists pg_trgm;"
+    docker compose exec db psql -U org -d postgres -c "create extension if not exists btree_gin;"
 
     # Run migrations
     docker compose exec app alembic upgrade head
@@ -48,15 +48,15 @@ A directory of organizations with location-based search capabilities.
 2.  **Configure Environment:**
     Create a `.env` file (or use environment variables) with your database connection:
     ```bash
-    DB_URL=postgresql+asyncpg://user:password@localhost:5432/postgres
+    DB_URL=postgresql+asyncpg://org:org@db:5432/postgres
     ```
 
 3.  **Setup Database:**
     Make sure your local Postgres database exists and has extensions enabled:
     ```bash
-    psql -U user -d postgres -c "create extension if not exists postgis;"
-    psql -U user -d postgres -c "create extension if not exists pg_trgm;"
-    psql -U user -d postgres -c "create extension if not exists btree_gin;"
+    psql -U org -d postgres -c "create extension if not exists postgis;"
+    psql -U org -d postgres -c "create extension if not exists pg_trgm;"
+    psql -U org -d postgres -c "create extension if not exists btree_gin;"
     ```
 
 4.  **Run Migrations:**
