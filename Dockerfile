@@ -7,9 +7,15 @@ RUN apt-get update && apt-get install -y \
     libpq-dev \
     && rm -rf /var/lib/apt/lists/*
 
-COPY . .
+RUN useradd -ms /bin/sh -u 1001 app
 
+RUN mkdir src
+COPY pyproject.toml README.md .
 RUN pip install --no-cache-dir .
+
+COPY --chown=app:app . /app
+
+USER app
 
 EXPOSE 3001
 

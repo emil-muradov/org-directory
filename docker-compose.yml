@@ -1,14 +1,20 @@
 services:
   app:
     build: .
+    develop:
+      watch:
+      - action: sync
+        path: ./src
+        target: /app/src/
+        initial_sync: true
     ports:
       - "3001:3001"
+    environment:
+      PYTHONPATH: /app/src
     env_file:
       - .env
     depends_on:
       - db
-    volumes:
-      - .:/app
     command: uvicorn src.main:app --host 0.0.0.0 --port 3001 --reload
 
   db:

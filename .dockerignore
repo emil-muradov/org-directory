@@ -2,6 +2,7 @@
 .git
 .gitignore
 .ruff_cache
-.DS_Store
 .ruff.toml
+scripts/
+**/.DS_Store
 uv.lock
