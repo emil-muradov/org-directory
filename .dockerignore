@@ -1,0 +1,7 @@
+.venv
+.git
+.gitignore
+.ruff_cache
+.DS_Store
+.ruff.toml
+uv.lock

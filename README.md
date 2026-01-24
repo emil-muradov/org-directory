@@ -17,9 +17,9 @@ A directory of organizations with location-based search capabilities.
 
     ```bash
     # Enable required extensions
-    docker compose exec db psql -U org -d postgres -c "create extension if not exists postgis;"
-    docker compose exec db psql -U org -d postgres -c "create extension if not exists pg_trgm;"
-    docker compose exec db psql -U org -d postgres -c "create extension if not exists btree_gin;"
+    docker compose exec db psql -U admin -d postgres -c "create extension if not exists postgis;"
+    docker compose exec db psql -U admin -d postgres -c "create extension if not exists pg_trgm;"
+    docker compose exec db psql -U admin -d postgres -c "create extension if not exists btree_gin;"
 
     # Run migrations
     docker compose exec app alembic upgrade head
