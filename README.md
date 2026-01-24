@@ -6,12 +6,14 @@ A directory of organizations with location-based search capabilities.
 
 ### Option 1: Using Docker (Recommended)
 
-1.  **Start the services:**
+1. Create `.env` file in the project root and copy variables from `.env.example`
+
+2.  **Start services:**
     ```bash
     docker compose up --watch
     ```
 
-2.  **Set up database:**
+3.  **Set up database:**
     
     Wait for the database to be ready, then run the following commands to set up extensions and schema.
 
@@ -28,7 +30,7 @@ A directory of organizations with location-based search capabilities.
     cat scripts/seed_test_data.sql | docker compose exec -T db psql -U org -d postgres
     ```
 
-3.  **Access the application:**
+4.  **Access the application:**
     *   API: http://localhost:3001
     *   Docs: http://localhost:3001/docs
 
@@ -38,20 +40,27 @@ A directory of organizations with location-based search capabilities.
 *   Python 3.13+
 *   PostgreSQL with PostGIS installed locally (or use docker image `postgis/postgis:15-3.4-alpine`)
 
-1.  **Install dependencies:**
+1. **Create virtual environment:**
+
+    ```bash
+    python -m venv .venv
+    source .venv/bin/activate
+    ```
+
+2.  **Install dependencies:**
     ```bash
     pip install .
     # Install dev dependencies if needed
     pip install ".[dev,test]"
     ```
 
-2.  **Configure Environment:**
+3.  **Configure environment:**
     Create a `.env` file (or use environment variables) with your database connection:
     ```bash
     DB_URL=postgresql+asyncpg://org:org@db:5432/postgres
     ```
 
-3.  **Setup Database:**
+4.  **Set up database:**
     Make sure your local Postgres database exists and has extensions enabled:
     ```bash
     psql -U org -d postgres -c "create extension if not exists postgis;"
@@ -59,12 +68,12 @@ A directory of organizations with location-based search capabilities.
     psql -U org -d postgres -c "create extension if not exists btree_gin;"
     ```
 
-4.  **Run Migrations:**
+5.  **Run migrations:**
     ```bash
     alembic upgrade head
     ```
 
-5.  **Run the App:**
+6.  **Run the app:**
     ```bash
     uvicorn src.main:app --host 0.0.0.0 --port 3001 --reload
     ```
