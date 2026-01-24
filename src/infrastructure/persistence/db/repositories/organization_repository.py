@@ -70,7 +70,6 @@ class OrganizationRepositoryImpl(OrganizationRepository):
                 selectinload(Organization.phones),
                 selectinload(Organization.industries),
             )
-            .order_by(Organization.created_at)
             .limit(limit)
             .offset(offset)
         )
@@ -204,82 +203,64 @@ class OrganizationRepositoryImpl(OrganizationRepository):
         offset: int,
     ) -> list[Organization]:
         """
-        Find organizations with multiple combined filters (AND logic).
+        Find organizations by many parameters combined.
         All provided filters are combined with AND.
         """
-        # Determine what joins we need
-        needs_building_join = address is not None or point_wkt is not None or polygon_wkt is not None
-        needs_industry_join = industry_id is not None or industry_name is not None
-
         stmt = select(Organization)
 
-        # Add building join if needed
-        if needs_building_join:
+        if any([address, point_wkt, polygon_wkt]):
             stmt = stmt.join(Organization.building)
 
-        # Add industry join if needed
-        if needs_industry_join:
+        if any([industry_id, industry_name]):
             stmt = stmt.join(Organization.industries)
 
-        # Handle industry_name filter with parent hierarchy (requires additional joins)
-        parent1 = None
-        parent2 = None
-        parent3 = None
-        if industry_name is not None:
+        if industry_name:
             parent1 = aliased(Industry)
             parent2 = aliased(Industry)
             parent3 = aliased(Industry)
-            # Ensure we have the base industry join
-            if not needs_industry_join:
-                stmt = stmt.join(Organization.industries)
-            stmt = stmt.outerjoin(parent1, Industry.parent_id == parent1.id)
-            stmt = stmt.outerjoin(parent2, parent1.parent_id == parent2.id)
-            stmt = stmt.outerjoin(parent3, parent2.parent_id == parent3.id)
 
-        # Always eager load relationships
-        stmt = stmt.options(
-            selectinload(Organization.building),
-            selectinload(Organization.phones),
-            selectinload(Organization.industries),
-        )
-
-        # Apply filters
-        if building_id is not None:
-            stmt = stmt.filter(Organization.building_id == building_id)
-
-        if industry_id is not None:
-            stmt = stmt.filter(Industry.id == industry_id)
-
-        if organization_name is not None:
-            stmt = stmt.filter(Organization.name.ilike(f"%{organization_name}%"))
-
-        if industry_name is not None:
-            stmt = stmt.filter(
-                or_(
-                    Industry.name.ilike(f"%{industry_name}%"),
-                    parent1.name.ilike(f"%{industry_name}%"),
-                    parent2.name.ilike(f"%{industry_name}%"),
-                    parent3.name.ilike(f"%{industry_name}%"),
+            stmt = (
+                stmt.outerjoin(parent1, Industry.parent_id == parent1.id)
+                .outerjoin(parent2, parent1.parent_id == parent2.id)
+                .outerjoin(parent3, parent2.parent_id == parent3.id)
+                .filter(
+                    or_(
+                        Industry.name.ilike(f"%{industry_name}%"),
+                        parent1.name.ilike(f"%{industry_name}%"),
+                        parent2.name.ilike(f"%{industry_name}%"),
+                        parent3.name.ilike(f"%{industry_name}%"),
+                    )
                 )
             )
 
-        if address is not None:
-            # Building join already added if needs_building_join was True
+        if industry_id:
+            stmt = stmt.filter(Industry.id == industry_id)
+
+        if building_id:
+            stmt = stmt.filter(Organization.building_id == building_id)
+
+        if organization_name:
+            stmt = stmt.filter(Organization.name.ilike(f"%{organization_name}%"))
+
+        if address:
             stmt = stmt.filter(Building.address.ilike(f"%{address}%"))
 
         if point_wkt:
-            # within a threashold of 100 meters
             stmt = stmt.filter(func.ST_DWithin(Building.coordinates, point_wkt, 0.001))
 
-        if polygon_wkt is not None:
+        if polygon_wkt:
             stmt = stmt.filter(func.ST_Contains(polygon_wkt, Building.coordinates))
 
-        # Apply distinct if we have joins that might create duplicates
-        if needs_industry_join or industry_name is not None:
-            stmt = stmt.distinct()
-
-        # Ordering and pagination
-        stmt = stmt.order_by(Organization.created_at).limit(limit).offset(offset)
+        stmt = (
+            stmt.options(
+                selectinload(Organization.building),
+                selectinload(Organization.phones),
+                selectinload(Organization.industries),
+            )
+            .distinct()
+            .limit(limit)
+            .offset(offset)
+        )
 
         result = await self._session.execute(stmt)
         return list(result.scalars().all())
