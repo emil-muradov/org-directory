@@ -25,7 +25,7 @@ app.include_router(v1_router)
 
 @app.get("/")
 def health():
-    return Response(status_code=200)
+    return Response(status_code=200, content="OK")
 
 
 if __name__ == "__main__":
