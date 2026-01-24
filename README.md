@@ -11,7 +11,7 @@ A directory of organizations with location-based search capabilities.
     docker compose up --watch
     ```
 
-2.  **Initialize the Database:**
+2.  **Set up database:**
     
     Wait for the database to be ready, then run the following commands to set up extensions and schema.
 
@@ -36,7 +36,7 @@ A directory of organizations with location-based search capabilities.
 
 **Prerequisites:**
 *   Python 3.13+
-*   PostgreSQL with PostGIS installed locally
+*   PostgreSQL with PostGIS installed locally (or use docker image `postgis/postgis:15-3.4-alpine`)
 
 1.  **Install dependencies:**
     ```bash
