@@ -2,6 +2,55 @@
 
 A directory of organizations with location-based search capabilities.
 
+
+## Database Schema
+
+```
+┌───────────────────────────┐
+│         Building          │
+├───────────────────────────┤
+│ id          SERIAL     PK │
+│ address     STRING        │
+│ coordinates GEOMETRY      │
+│ created_at  DATETIME      │
+│ updated_at  DATETIME      │
+└─────────────┬─────────────┘
+              │
+              │ 1:*
+              ▼
+┌─────────────┴─────────────┐                 ┌─────────────────────────────┐
+│        Organization       │                 │            Phone            │
+├───────────────────────────┤                 ├─────────────────────────────┤
+│ id          SERIAL     PK │ 1:*             │ id              SERIAL   PK │
+│ name        STRING     UK ├────────────────►│ organization_id INTEGER  FK │
+│ building_id INTEGER    FK │                 │ phone_number    STRING      │
+│ created_at  DATETIME      │                 │ created_at      DATETIME    │
+│ updated_at  DATETIME      │                 │ updated_at      DATETIME    │
+└─────────────┬─────────────┘                 └─────────────────────────────┘
+              │
+              │ *:*
+              ▼
+┌─────────────┴─────────────┐
+│  organization_industries  │
+├───────────────────────────┤
+│ organization_id INT PK,FK │
+│ industry_id     INT PK,FK │
+│ created_at      DATETIME  │
+└─────────────┬─────────────┘
+              │
+              │ *:1
+              ▼
+┌─────────────┴─────────────┐
+│          Industry         │◄───┐
+├───────────────────────────┤    │
+│ id         SERIAL      PK │    │ parent_id
+│ parent_id  INTEGER     FK │────┘ (self-ref)
+│ name       STRING      UK │
+│ created_at DATETIME       │
+│ updated_at DATETIME       │
+└───────────────────────────┘
+```
+
 ## Setup
 
 ### Option 1: Using Docker (Recommended)
