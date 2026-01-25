@@ -7,7 +7,7 @@ A directory of organizations with location-based search capabilities.
 
 ```
 ┌───────────────────────────┐
-│         Building          │
+│         buildings         │
 ├───────────────────────────┤
 │ id          SERIAL     PK │
 │ address     STRING        │
@@ -19,7 +19,7 @@ A directory of organizations with location-based search capabilities.
               │ 1:*
               ▼
 ┌─────────────┴─────────────┐                 ┌─────────────────────────────┐
-│        Organization       │                 │            Phone            │
+│        organizations      │                 │            phones           │
 ├───────────────────────────┤                 ├─────────────────────────────┤
 │ id          SERIAL     PK │ 1:*             │ id              SERIAL   PK │
 │ name        STRING     UK ├────────────────►│ organization_id INTEGER  FK │
@@ -41,7 +41,7 @@ A directory of organizations with location-based search capabilities.
               │ *:1
               ▼
 ┌─────────────┴─────────────┐
-│          Industry         │◄───┐
+│          industries       │◄───┐
 ├───────────────────────────┤    │
 │ id         SERIAL      PK │    │ parent_id
 │ parent_id  INTEGER     FK │────┘ (self-ref)
