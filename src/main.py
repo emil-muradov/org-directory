@@ -5,6 +5,7 @@ import uvicorn
 
 from api.v1.routes import router as v1_router
 from infrastructure.di.container import Container
+from config.settings import settings
 
 
 app = FastAPI()
@@ -29,4 +30,4 @@ def health():
 
 
 if __name__ == "__main__":
-    uvicorn.run("main:app", host="127.0.0.1", port=3001, reload=True)
+    uvicorn.run("main:app", host="0.0.0.0", port=settings.port, reload=True)

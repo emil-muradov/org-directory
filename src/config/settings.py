@@ -9,6 +9,7 @@ class Settings(BaseSettings):
     environment: str = Field("development")
     db_url: SecretStr = Field(..., description="Database connection URL")
     db_pool_size: int = Field(8)
+    port: int = Field(8080, description="Web-server listening port")
 
 
 settings = Settings()
