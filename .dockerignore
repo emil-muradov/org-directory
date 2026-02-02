@@ -5,4 +5,3 @@
 .ruff.toml
 scripts/
 **/.DS_Store
-uv.lock
