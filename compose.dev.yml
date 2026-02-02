@@ -17,9 +17,9 @@ services:
   db:
     image: postgis/postgis:15-3.3
     environment:
-      POSTGRES_USER: org
-      POSTGRES_PASSWORD: org
-      POSTGRES_DB: postgres
+      POSTGRES_USER: ${POSTGRES_USER}
+      POSTGRES_PASSWORD: ${POSTGRES_PASSWORD}
+      POSTGRES_DB: ${POSTGRES_DB}
     ports:
       - "${COMPOSE_DB_PORT:-5432}:5432"
     volumes:

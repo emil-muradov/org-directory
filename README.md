@@ -10,10 +10,10 @@ A directory of organizations with location-based search capabilities.
 │         buildings         │
 ├───────────────────────────┤
 │ id          SERIAL     PK │
-│ address     STRING        │
+│ address     TEXT          │
 │ coordinates GEOMETRY      │
-│ created_at  DATETIME      │
-│ updated_at  DATETIME      │
+│ created_at  TIMESTAMP     │
+│ updated_at  TIMESTAMP     │
 └─────────────┬─────────────┘
               │
               │ 1:*
@@ -22,10 +22,10 @@ A directory of organizations with location-based search capabilities.
 │        organizations      │                 │            phones           │
 ├───────────────────────────┤                 ├─────────────────────────────┤
 │ id          SERIAL     PK │ 1:*             │ id              SERIAL   PK │
-│ name        STRING     UK ├────────────────►│ organization_id INTEGER  FK │
-│ building_id INTEGER    FK │                 │ phone_number    STRING      │
-│ created_at  DATETIME      │                 │ created_at      DATETIME    │
-│ updated_at  DATETIME      │                 │ updated_at      DATETIME    │
+│ name        TEXT       UK ├────────────────►│ organization_id INTEGER  FK │
+│ building_id INTEGER    FK │                 │ phone_number    TEXT        │
+│ created_at  TIMESTAMP     │                 │ created_at      TIMESTAMP   │
+│ updated_at  TIMESTAMP     │                 │ updated_at      TIMESTAMP   │
 └─────────────┬─────────────┘                 └─────────────────────────────┘
               │
               │ *:*
@@ -35,7 +35,7 @@ A directory of organizations with location-based search capabilities.
 ├───────────────────────────┤
 │ organization_id INT PK,FK │
 │ industry_id     INT PK,FK │
-│ created_at      DATETIME  │
+│ created_at      TIMESTAMP │
 └─────────────┬─────────────┘
               │
               │ *:1
@@ -45,9 +45,9 @@ A directory of organizations with location-based search capabilities.
 ├───────────────────────────┤    │
 │ id         SERIAL      PK │    │ parent_id
 │ parent_id  INTEGER     FK │────┘ (self-ref)
-│ name       STRING      UK │
-│ created_at DATETIME       │
-│ updated_at DATETIME       │
+│ name       TEXT        UK │
+│ created_at TIMESTAMP      │
+│ updated_at TIMESTAMP      │
 └───────────────────────────┘
 ```
 
